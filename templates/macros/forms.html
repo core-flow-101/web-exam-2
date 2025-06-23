@@ -1,0 +1,32 @@
+{% macro recipe_form(form, show_images=True) %}
+    <div class="mb-3">
+        {{ form.title.label(class="form-label") }}
+        {{ form.title(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", id="description") }}
+    </div>
+    <div class="mb-3">
+        {{ form.cooking_time.label(class="form-label") }}
+        {{ form.cooking_time(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.servings.label(class="form-label") }}
+        {{ form.servings(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.ingredients.label(class="form-label") }}
+        {{ form.ingredients(class="form-control", id="ingredients") }}
+    </div>
+    <div class="mb-3">
+        {{ form.steps.label(class="form-label") }}
+        {{ form.steps(class="form-control", id="steps") }}
+    </div>
+    {% if show_images %}
+    <div class="mb-3">
+        {{ form.images.label(class="form-label") }}
+        {{ form.images(class="form-control", multiple=True) }}
+    </div>
+    {% endif %}
+{% endmacro %}

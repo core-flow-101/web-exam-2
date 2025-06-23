@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ recipe.title }}</h2>
+
+
+{% if images %}
+<div class="mb-4">
+    <div class="row g-2">
+        {% for image in images %}
+        <div class="col-auto">
+            <img src="{{ url_for('static', filename='uploads/' ~ image.filename) }}" alt="Фото рецепта" class="img-thumbnail" style="max-width: 200px;">
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><strong>Время приготовления:</strong> {{ recipe.cooking_time }} мин</li>
+    <li class="list-group-item"><strong>Порций:</strong> {{ recipe.servings }}</li>
+    <li class="list-group-item"><strong>Автор:</strong>
+        {% if recipe.user %}
+            {{ recipe.user.first_name }} {{ recipe.user.last_name }}
+        {% else %}
+            Неизвестно
+        {% endif %}
+    </li>
+</ul>
+
+
+<div class="mb-4">
+    <h4>Описание</h4>
+    <div class="border rounded p-3 bg-light">{{ description_html|safe }}</div>
+</div>
+
+
+<div class="mb-4">
+    <h4>Ингредиенты</h4>
+    <div class="border rounded p-3 bg-light">{{ ingredients_html|safe }}</div>
+</div>
+
+
+<div class="mb-4">
+    <h4>Шаги приготовления</h4>
+    <div class="border rounded p-3 bg-light">{{ steps_html|safe }}</div>
+</div>
+
+
+<div class="mb-4">
+    <h4>Отзывы</h4>
+    {% if reviews %}
+        {% for review in reviews %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div>
+                    <strong>
+                        {% if review.user %}
+                            {{ review.user.first_name }} {{ review.user.last_name }}
+                        {% else %}
+                            Неизвестно
+                        {% endif %}
+                    </strong>
+                    <span class="ms-2"><i class="fas fa-star text-warning"></i> {{ review.rating }}</span>
+                </div>
+                <div class="mt-2">{{ review.text | markdown | safe }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Пока нет отзывов.</p>
+    {% endif %}
+</div>
+
+{% if current_user.is_authenticated %}
+    {% set user_review = None %}
+    {% for review in reviews %}
+        {% if review.user_id == current_user.id %}
+            {% set user_review = review %}
+        {% endif %}
+    {% endfor %}
+
+    {% if not user_review %}
+        <a href="{{ url_for('add_review', recipe_id=recipe.id) }}" class="btn btn-success mt-3">Написать отзыв</a>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            <strong>Ваш отзыв:</strong>
+            <div class="mt-2">
+                <span class="me-2"><i class="fas fa-star text-warning"></i> {{ user_review.rating }}</span>
+                <span>{{ user_review.text | markdown | safe }}</span>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+
+
+<div class="mb-3 text-center">
+    {% if current_user.is_authenticated %}
+        {% set is_admin = current_user.role and current_user.role.name == 'Администратор' %}
+        {% if recipe.user_id == current_user.id or is_admin %}
+            <a href="{{ url_for('edit_recipe', id=recipe.id) }}" class="btn btn-warning me-2">Редактировать</a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Удалить рецепт
+            </button>
+        {% endif %}
+    {% endif %}
+</div>
+
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Удаление рецепта</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        Вы уверены, что хотите удалить рецепт <strong>{{ recipe.title }}</strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+        <form method="post" action="{{ url_for('delete_recipe', id=recipe.id) }}">
+            {{ form.hidden_tag() if form is defined }}
+            <button type="submit" class="btn btn-danger">Да</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

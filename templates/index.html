@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Последние рецепты</h1>
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for recipe, avg_rating, reviews_count in recipes %}
+        <div class="col d-flex align-items-stretch">
+            <div class="card h-100 w-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center mb-3">{{ recipe.title }}</h5>
+                    
+                    <div class="mb-2">
+                        <span class="fw-semibold"><i class="fas fa-clock"></i> Время приготовления:</span>
+                        <span class="ms-1">{{ recipe.cooking_time }} мин</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="fw-semibold"><i class="fas fa-utensils"></i> Порций:</span>
+                        <span class="ms-1">{{ recipe.servings }}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="fw-semibold"><i class="fas fa-star text-warning"></i> Оценка:</span>
+                        <span class="ms-1">
+                            {% if reviews_count > 0 %}
+                                {{ avg_rating|round(1) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="fw-semibold"><i class="fas fa-comments"></i> Отзывы:</span>
+                        <span class="ms-1">{{ reviews_count }}</span>
+                    </div>
+                    <div class="mt-auto text-center">
+                        <a href="{{ url_for('view_recipe', id=recipe.id) }}" class="btn btn-outline-primary btn-sm mt-2">Подробнее</a>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        Автор: 
+                        {% if recipe.user %}
+                            {{ recipe.user.first_name }} {{ recipe.user.last_name }}
+                        {% else %}
+                            Неизвестно
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('index', page=pagination.prev_num) }}">Предыдущая</a>
+        </li>
+        {% endif %}
+        
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('index', page=page) }}">{{ page }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('index', page=pagination.next_num) }}">Следующая</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endblock %} 
