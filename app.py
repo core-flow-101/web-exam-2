@@ -6,12 +6,15 @@ import bleach
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from dotenv import load_dotenv
+import pymysql
 
 from models import db, Recipe, User, Image, Review
 from forms import RecipeForm, ReviewForm, LoginForm
 from markupsafe import Markup
 import markdown
 
+# Регистрируем PyMySQL как драйвер MySQL
+pymysql.install_as_MySQLdb()
 
 load_dotenv()
 
