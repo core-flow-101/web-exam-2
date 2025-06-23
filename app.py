@@ -13,7 +13,7 @@ from forms import RecipeForm, ReviewForm, LoginForm
 from markupsafe import Markup
 import markdown
 
-# Регистрируем PyMySQL как драйвер MySQL
+
 pymysql.install_as_MySQLdb()
 
 load_dotenv()
@@ -227,7 +227,7 @@ def logout():
 
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    app.run(debug=debug_mode) 
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False').lower() == 'true') 
 
 
